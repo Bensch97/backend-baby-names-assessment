@@ -8,6 +8,8 @@
 
 import sys
 import re
+import codecs
+import glob
 
 """Baby Names exercise
 
@@ -35,6 +37,22 @@ Suggested milestones for incremental development:
 """
 
 def extract_names(filename):
+  kiddos = {}
+  f = codecs.open(filename, 'r')
+  for line in f:
+    if '<tr align="right">' in line:
+      number = re.search('<td>(.*)</td><td>(.*)</td><td>(.*)</td>', line)
+      kiddos[number.group(2)] = number.group(1)
+      kiddos[number.group(3)] = number.group(1)
+  year = filename[4:8]
+  keylist = kiddos.keys()
+  keylist.sort()
+  bambinos = [year]
+  for key in keylist:
+    bambinos.append("{} {}".format(key, kiddos[key]))
+  joined_bambinos = "\n".join(bambinos)
+  return joined_bambinos
+
   """
   Given a file name for baby.html, returns a list starting with the year string
   followed by the name-rank strings in alphabetical order.
@@ -59,10 +77,17 @@ def main():
   if args[0] == '--summaryfile':
     summary = True
     del args[0]
-
+    year = 1990
+    for i, filee in enumerate(args):
+      f = open('{}foo.html.summary'.format(year), 'w')
+      f.write(extract_names(args[i]))
+      year += 2
+  else:
+    print(extract_names(args[0]))
   # +++your code here+++
   # For each filename, get the names, then either print the text output
   # or write it to a summary file
+
   
 if __name__ == '__main__':
   main()
